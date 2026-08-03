@@ -18,10 +18,10 @@ int main()
 
     printf("\nPrime Numbers:\n");
 
-    #pragma omp parallel for
-    for(int i = start; i <= end; i++)
+#pragma omp parallel for
+    for (int i = start; i <= end; i++)
     {
-        if(isPrime(i))
+        if (isPrime(i))
         {
             printf("%d (Thread %d)\n",
                    i, omp_get_thread_num());
@@ -33,11 +33,11 @@ int main()
 
 int isPrime(int n)
 {
-    if(n < 2)
+    if (n < 2)
         return 0;
 
-    for(int i = 2; i <= sqrt(n); i++)
-        if(n % i == 0)
+    for (int i = 2; i <= sqrt(n); i++)
+        if (n % i == 0)
             return 0;
 
     return 1;
