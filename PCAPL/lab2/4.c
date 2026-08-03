@@ -40,38 +40,38 @@ int main()
 	double serial_start = omp_get_wtime();
 
 	for (int i = 0; i < M; i++)
-    {
-        Ys[i] = 0;
-        for (int j = 0; j < N; j++)
-            Ys[i] += A[i][j] * X[j];
-    }
+	{
+		Ys[i] = 0;
+		for (int j = 0; j < N; j++)
+			Ys[i] += A[i][j] * X[j];
+	}
 
-    double serial_end = omp_get_wtime();
+	double serial_end = omp_get_wtime();
 
-    // parallel multiplication
-    double parallel_start = omp_get_wtime();
+	// parallel multiplication
+	double parallel_start = omp_get_wtime();
 
-    #pragma omp parallel for
-    for (int i = 0; i < M; i++)
-    {
-        int tid = omp_get_thread_num();
+#pragma omp parallel for
+	for (int i = 0; i < M; i++)
+	{
+		int tid = omp_get_thread_num();
 
-        Yp[i] = 0;
-        for (int j = 0; j < N; j++)
-            Yp[i] += A[i][j] * X[j];
+		Yp[i] = 0;
+		for (int j = 0; j < N; j++)
+			Yp[i] += A[i][j] * X[j];
 
-        printf("Row %d computed by thread %d\n", i, tid);
-    }
+		printf("Row %d computed by thread %d\n", i, tid);
+	}
 
-    double parallel_end = omp_get_wtime();
+	double parallel_end = omp_get_wtime();
 
-    printf("\nResult Vector:\n");
-    for (int i = 0; i < M; i++)
-        printf("%8d", Yp[i]);
-    printf("\n");
+	printf("\nResult Vector:\n");
+	for (int i = 0; i < M; i++)
+		printf("%8d", Yp[i]);
+	printf("\n");
 
-    printf("\nSerial Execution Time: %f seconds\n", serial_end - serial_start);
-    printf("Parallel Execution Time: %f seconds\n", parallel_end - parallel_start);
+	printf("\nSerial Execution Time: %f seconds\n", serial_end - serial_start);
+	printf("Parallel Execution Time: %f seconds\n", parallel_end - parallel_start);
 
-    return 0;
+	return 0;
 }

@@ -16,13 +16,13 @@ int main()
     int n = sizeof(A) / sizeof(A[0]);
 
     printf("Original Array:\n");
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         printf("%6d", A[i]);
 
     printf("\n");
 
-    #pragma omp parallel for
-    for(int i = 0; i < n; i++)
+#pragma omp parallel for
+    for (int i = 0; i < n; i++)
     {
         A[i] = reverse(A[i]);
         printf("Element %d processed by Thread %d\n",
@@ -30,7 +30,7 @@ int main()
     }
 
     printf("\nReversed Array:\n");
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         printf("%6d", A[i]);
 
     printf("\n");
@@ -42,7 +42,7 @@ int reverse(int n)
 {
     int rev = 0;
 
-    while(n > 0)
+    while (n > 0)
     {
         rev = rev * 10 + n % 10;
         n /= 10;

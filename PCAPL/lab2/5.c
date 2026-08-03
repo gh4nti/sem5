@@ -16,9 +16,9 @@ int main()
 
     srand(time(NULL));
 
-    #pragma omp parallel
+#pragma omp parallel
     {
-        #pragma omp single
+#pragma omp single
         {
             int tid = omp_get_thread_num();
 
@@ -28,7 +28,7 @@ int main()
                 A[i] = rand() % 100;
         }
 
-        #pragma omp for
+#pragma omp for
         for (int i = 0; i < n; i++)
         {
             int tid = omp_get_thread_num();

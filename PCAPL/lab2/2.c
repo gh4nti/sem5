@@ -32,7 +32,7 @@ int main()
 	}
 	printf("\n");
 
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int i = 0; i < N; i++)
 	{
 		int tid = omp_get_thread_num();
@@ -49,7 +49,8 @@ int main()
 				max = A[i][j];
 		}
 
-		for (int j = 0; j < N; j++) {
+		for (int j = 0; j < N; j++)
+		{
 			if (i == j)
 				B[i][j] = 0;
 			else if (i > j)

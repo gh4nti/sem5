@@ -32,7 +32,7 @@ int main()
 	}
 	printf("\n");
 
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int i = 0; i < M; i++)
 	{
 		int tid = omp_get_thread_num();
@@ -56,19 +56,19 @@ int main()
 
 	printf("\nB:\n");
 	for (int i = 0; i < M; i++)
-    {
-        for (int j = 0; j < N; j++)
-            printf("%5d", B[i][j]);
-        printf("\n");
-    }
+	{
+		for (int j = 0; j < N; j++)
+			printf("%5d", B[i][j]);
+		printf("\n");
+	}
 
-    printf("\nD:\n");
-    for (int i = 0; i < M; i++)
-    {
-        for (int j = 0; j < N; j++)
-            printf("%5d", D[i][j]);
-        printf("\n");
-    }
+	printf("\nD:\n");
+	for (int i = 0; i < M; i++)
+	{
+		for (int j = 0; j < N; j++)
+			printf("%5d", D[i][j]);
+		printf("\n");
+	}
 }
 
 int countSetBits(int n)

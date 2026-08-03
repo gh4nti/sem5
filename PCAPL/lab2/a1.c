@@ -11,7 +11,7 @@ int main()
     printf("Enter an integer: ");
     scanf("%d", &i);
 
-    #pragma omp parallel
+#pragma omp parallel
     {
         int tid = omp_get_thread_num();
         double result = pow(i, tid);

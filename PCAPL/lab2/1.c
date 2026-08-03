@@ -55,7 +55,7 @@ int main()
 	// parallel addition
 	double parallel_start = omp_get_wtime();
 
-	#pragma omp parallel for
+#pragma omp parallel for
 	for (int i = 0; i < M; i++)
 	{
 		int tid = omp_get_thread_num();

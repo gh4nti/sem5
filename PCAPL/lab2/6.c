@@ -7,7 +7,7 @@
 
 int main()
 {
-	int n;
+    int n;
 
     printf("Enter the size of the vectors: ");
     scanf("%d", &n);
@@ -48,11 +48,11 @@ int main()
     // parallel
     double parallel_start = omp_get_wtime();
 
-    #pragma omp parallel
+#pragma omp parallel
     {
-        #pragma omp single
+#pragma omp single
         {
-            #pragma omp task
+#pragma omp task
             {
                 int tid = omp_get_thread_num();
                 printf("\nAddition performed by thread %d\n", tid);
@@ -61,7 +61,7 @@ int main()
                     add[i] = A[i] + B[i];
             }
 
-            #pragma omp task
+#pragma omp task
             {
                 int tid = omp_get_thread_num();
                 printf("subtraction performed by thread %d\n", tid);
@@ -70,7 +70,7 @@ int main()
                     sub[i] = A[i] - B[i];
             }
 
-            #pragma omp task
+#pragma omp task
             {
                 int tid = omp_get_thread_num();
                 printf("Multiplication performed by thread %d\n", tid);
@@ -79,7 +79,7 @@ int main()
                     mul[i] = A[i] * B[i];
             }
 
-            #pragma omp taskwait
+#pragma omp taskwait
         }
     }
 

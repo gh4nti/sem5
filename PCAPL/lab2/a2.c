@@ -16,31 +16,31 @@ int main()
 
     srand(time(NULL));
 
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
         A[i] = rand() % 100;
         B[i] = rand() % 100;
     }
 
     printf("\nA:\n");
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         printf("%4d", A[i]);
 
     printf("\n\nB:\n");
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         printf("%4d", B[i]);
 
     printf("\n");
 
-    #pragma omp parallel for
-    for(int i = 0; i < n; i++)
+#pragma omp parallel for
+    for (int i = 0; i < n; i++)
     {
         C[i] = A[i] + B[i];
         printf("Element %d computed by Thread %d\n", i, omp_get_thread_num());
     }
 
     printf("\nResult:\n");
-    for(int i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
         printf("%4d", C[i]);
 
     printf("\n");
