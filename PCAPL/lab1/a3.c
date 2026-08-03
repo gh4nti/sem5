@@ -25,6 +25,5 @@ int main()
     }
 
     printf("\nToggled String: %s\n", str);
-
     return 0;
 }
