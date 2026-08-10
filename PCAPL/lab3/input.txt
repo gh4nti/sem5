@@ -1,0 +1,4 @@
+OpenMP is a parallel programming model.
+Threads execute tasks concurrently.
+Tokenization divides text into words.
+Parallel processing improves performance.
