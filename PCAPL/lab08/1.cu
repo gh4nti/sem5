@@ -4,20 +4,20 @@
 #include <stdlib.h>
 #include <cuda_runtime.h>
 
-__global__ void convolutionKernel_1D(int *N, int *M, int *P, int width, int mask_width)
+__global__ void convolution1D(int *N, int *M, int *P, int n, int k)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (i < width)
+    if (i < n)
     {
         int sum = 0;
-        int radius = mask_width / 2;
+        int radius = k / 2;
 
-        for (int j = 0; j < mask_width; j++)
+        for (int j = 0; j < k; j++)
         {
             int idx = i - radius + j;
 
-            if (idx >= 0 && idx < width)
+            if (idx >= 0 && idx < n)
                 sum += N[idx] * M[j];
         }
 
@@ -27,44 +27,44 @@ __global__ void convolutionKernel_1D(int *N, int *M, int *P, int width, int mask
 
 int main()
 {
-    int width, mask_width;
+    int n, k;
 
     printf("Enter input array size: ");
-    scanf("%d", &width);
+    scanf("%d", &n);
 
     printf("Enter mask size: ");
-    scanf("%d", &mask_width);
+    scanf("%d", &k);
 
-    int *N = (int *)malloc(width * sizeof(int));
-    int *M = (int *)malloc(mask_width * sizeof(int));
-    int *P = (int *)malloc(width * sizeof(int));
+    int *N = (int *)malloc(n * sizeof(int));
+    int *M = (int *)malloc(k * sizeof(int));
+    int *P = (int *)malloc(n * sizeof(int));
 
     printf("Enter input array: ");
-    for (int i = 0; i < width; i++)
+    for (int i = 0; i < n; i++)
         scanf("%d", &N[i]);
     
     printf("Enter mask array: ");
-    for (int i = 0; i < mask_width; i++)
+    for (int i = 0; i < k; i++)
         scanf("%d", &M[i]);
     
     int *d_N, *d_M, *d_P;
 
-    cudaMalloc((void **)&d_N, width * sizeof(int));
-    cudaMalloc((void **)&d_M, mask_width * sizeof(int));
-    cudaMalloc((void **)&d_P, width * sizeof(int));
+    cudaMalloc((void **)&d_N, n * sizeof(int));
+    cudaMalloc((void **)&d_M, k * sizeof(int));
+    cudaMalloc((void **)&d_P, n * sizeof(int));
 
-    cudaMemcpy(d_N, N, width * sizeof(int), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_M, M, mask_width * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_N, N, n * sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_M, M, k * sizeof(int), cudaMemcpyHostToDevice);
 
     int blockSize = 256;
-    int gridSize = (width + blockSize - 1) / blockSize;
+    int gridSize = (n + blockSize - 1) / blockSize;
 
-    convolutionKernel_1D<<<gridSize, blockSize>>>(d_N, d_M, d_P, width, mask_width);
+    convolution1D<<<gridSize, blockSize>>>(d_N, d_M, d_P, n, k);
 
-    cudaMemcpy(P, d_P, width * sizeof(int), cudaMemcpyDeviceToHost);
+    cudaMemcpy(P, d_P, n * sizeof(int), cudaMemcpyDeviceToHost);
 
     printf("Resultant array: ");
-    for (int i = 0; i < width; i++)
+    for (int i = 0; i < n; i++)
         printf("%d ", P[i]);
     printf("\n");
 
