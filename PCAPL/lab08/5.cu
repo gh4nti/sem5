@@ -1,90 +1,83 @@
-// Implement a program in CUDA to count the number of times a given word is repeated in a sentence using an atomic function.
+// Implement a CUDA program that reads a string and replaces every vowel with '*'. Use an appropriate atomic function to replace the character with *.
 
 #include <stdio.h>
 #include <string.h>
 #include <cuda_runtime.h>
 
-__device__ int isMatch(char *sentence, char *word, int start, int wordLength, int sentenceLength)
+__device__ int isVowel(char c)
 {
-    if (start + wordLength > sentenceLength)
-        return 0;
-
-    for (int i = 0; i < wordLength; i++)
-    {
-        if (sentence[start + i] != word[i])
-            return 0;
-    }
-
-    if (start > 0 && sentence[start - 1] != ' ')
-        return 0;
-
-    if (start + wordLength < sentenceLength &&
-        sentence[start + wordLength] != ' ')
-        return 0;
-
-    return 1;
+    return (c == 'a' || c == 'e' || c == 'i' ||
+            c == 'o' || c == 'u' ||
+            c == 'A' || c == 'E' || c == 'I' ||
+            c == 'O' || c == 'U');
 }
 
-__global__ void countWord(char *sentence, char *word, int sentenceLength, int wordLength, int *count)
+__device__ void atomicReplace(char *str, int index)
+{
+    int wordIndex = index / 4;
+    int byteIndex = index % 4;
+
+    unsigned int *address = ((unsigned int *)str) + wordIndex;
+    int shift = byteIndex * 8;
+
+    unsigned int oldValue;
+    unsigned int newValue;
+
+    do
+    {
+        oldValue = *address;
+
+        newValue =
+            (oldValue & ~(0xFFu << shift)) |
+            ((unsigned int)'*' << shift);
+
+    } while (atomicCAS(address,
+                       oldValue,
+                       newValue) != oldValue);
+}
+
+__global__ void replaceVowels(char *str, int n)
 {
     int i = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (i < sentenceLength)
+    if (i < n)
     {
-        if (isMatch(sentence, word, i, wordLength, sentenceLength))
-            atomicAdd(count, 1);
+        if (isVowel(str[i]))
+            atomicReplace(str, i);
     }
 }
 
 int main()
 {
-    char sentence[500];
-    char word[100];
+    char str[500];
 
-    printf("Enter sentence: ");
-    fgets(sentence, 500, stdin);
+    printf("Enter string: ");
+    fgets(str, 500, stdin);
 
-    printf("Enter word to search: ");
-    scanf("%s", word);
+    str[strcspn(str, "\n")] = '\0';
 
-    sentence[strcspn(sentence, "\n")] = '\0';
+    int n = strlen(str);
 
-    int sentenceLength = strlen(sentence);
-    int wordLength = strlen(word);
+    char *d_str;
 
-    char *d_sentence, *d_word;
-    int *d_count;
+    cudaMalloc((void **)&d_str, n + 4);
 
-    int count = 0;
+    cudaMemset(d_str, 0, n + 4);
 
-    cudaMalloc((void **)&d_sentence, (sentenceLength + 1) * sizeof(char));
-    cudaMalloc((void **)&d_word, (wordLength + 1) * sizeof(char));
-    cudaMalloc((void **)&d_count, sizeof(int));
-
-    cudaMemcpy(d_sentence, sentence, (sentenceLength + 1) * sizeof(char), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_word, word, (wordLength + 1) * sizeof(char), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_count, &count, sizeof(int), cudaMemcpyHostToDevice);
+    cudaMemcpy(d_str, str, n + 1, cudaMemcpyHostToDevice);
 
     int threads = 256;
-    int blocks = (sentenceLength + threads - 1) / threads;
+    int blocks = (n + threads - 1) / threads;
 
-    countWord<<<blocks, threads>>>(
-        d_sentence,
-        d_word,
-        sentenceLength,
-        wordLength,
-        d_count
-    );
+    replaceVowels<<<blocks, threads>>>(d_str, n);
 
     cudaDeviceSynchronize();
 
-    cudaMemcpy(&count, d_count, sizeof(int), cudaMemcpyDeviceToHost);
+    cudaMemcpy(str, d_str, n + 1, cudaMemcpyDeviceToHost);
 
-    printf("Number of occurrences of \"%s\" = %d\n", word, count);
+    printf("Output String RS: %s\n", str);
 
-    cudaFree(d_sentence);
-    cudaFree(d_word);
-    cudaFree(d_count);
+    cudaFree(d_str);
 
     return 0;
 }
