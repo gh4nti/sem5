@@ -1,0 +1,7 @@
+Income,Credit,LoanApproved
+Low,Good,Yes
+Low,Bad,No
+Medium,Good,Yes
+Medium,Bad,Yes
+High,Good,Yes
+High,Bad,No
